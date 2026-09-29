@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sourdough Mix Calculator</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#8a4f2b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sourdough Calculator">
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#f7f4ee,#171614);--surface:light-dark(#fffdf8,#211f1c);--surface2:light-dark(#f1ece2,#2b2824);--text:light-dark(#24211d,#f3efe8);--muted:light-dark(#6f675c,#b8afa2);--border:light-dark(#ded6ca,#403b34);--accent:light-dark(#8a4f2b,#d9905e);--accent2:light-dark(#365f4b,#78a88f);--danger:light-dark(#a13b32,#e07b70)}
+*{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}#app{min-height:100vh;background:var(--bg)}
+main{max-width:900px;margin:0 auto;padding:28px 18px 40px}.hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:22px}.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}h1{font-family:Georgia,serif;font-size:clamp(30px,5vw,48px);line-height:1;margin:5px 0 8px}.sub{color:var(--muted);max-width:650px;line-height:1.5}.badge{padding:9px 12px;border:1px solid var(--border);border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;background:var(--surface)}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:14px}.panel h2{font-size:16px;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.field{min-width:0}.field label{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:750;margin-bottom:7px}.hint{font-weight:500;color:var(--muted)}input,select,button{font:inherit}input,select{width:100%;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:11px;padding:12px 13px;font-size:16px;outline:none}input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}.quick button,.action{border:1px solid var(--border);background:var(--surface2);color:var(--text);padding:9px 12px;border-radius:10px;cursor:pointer;font-weight:700}.quick button:hover,.action:hover{border-color:var(--accent)}
+.results{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.result{border:1px solid var(--border);background:var(--surface2);border-radius:14px;padding:14px}.result .label{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em}.result .value{font-size:clamp(24px,4vw,34px);font-weight:850;margin-top:5px}.result .unit{font-size:12px;color:var(--muted)}.primary{border-color:color-mix(in srgb,var(--accent) 55%,var(--border));background:color-mix(in srgb,var(--accent) 9%,var(--surface2))}.formula{display:grid;grid-template-columns:1fr 1fr;gap:10px}.formula div{padding:11px 12px;border-left:3px solid var(--accent);background:var(--surface2);border-radius:8px;font-size:13px}.formula strong{display:block;font-size:12px;margin-bottom:3px}.note{color:var(--muted);font-size:12px;line-height:1.5}.footer{display:flex;justify-content:space-between;gap:12px;align-items:center}.reset{color:var(--muted);background:transparent;border:0;cursor:pointer;text-decoration:underline;padding:8px}.warn{color:var(--danger);font-size:12px;margin-top:8px;display:none}
+@media(max-width:700px){.hero{display:block}.badge{display:inline-block;margin-top:12px}.results{grid-template-columns:repeat(2,minmax(0,1fr))}.formula{grid-template-columns:1fr}}@media(max-width:500px){.grid{grid-template-columns:1fr}main{padding:22px 13px 32px}}
+</style>
+</head>
+<body>
+<div id="app"><main>
+<section class="hero"><div><div class="eyebrow">Kitchen tool</div><h1>Sourdough Mix Calculator</h1><div class="sub">Enter the dough you want to make. The calculator accounts for the flour and water already contained in your starter.</div></div><div class="badge">All weights in grams</div></section>
+<section class="panel">
+<h2>Recipe settings</h2>
+<div class="grid">
+<div class="field"><label for="dough">Finished dough weight <span class="hint">250–5,000 g</span></label><input id="dough" type="number" min="250" max="5000" step="1" value="1000"></div>
+<div class="field"><label for="hydration">Hydration <span class="hint">50–100%</span></label><input id="hydration" type="number" min="50" max="100" step="0.5" value="70"></div>
+<div class="field"><label for="starter">Starter <span class="hint">% of total flour</span></label><input id="starter" type="number" min="0" max="40" step="0.5" value="20"></div>
+<div class="field"><label for="starterHyd">Starter hydration <span class="hint">100% = equal flour/water</span></label><input id="starterHyd" type="number" min="50" max="150" step="1" value="100"></div>
+<div class="field"><label for="salt">Salt <span class="hint">% of total flour</span></label><input id="salt" type="number" min="0" max="4" step="0.1" value="2"></div>
+</div>
+<div class="quick"><button type="button" data-preset="classic">Classic 1 kg</button><button type="button" data-preset="soft">Soft 1 kg</button><button type="button" data-preset="lean">Lean 750 g</button></div>
+<div id="warn" class="warn"></div>
+</section>
+<section class="panel">
+<h2>Choose a recipe</h2>
+<div class="field"><label for="recipe">Recipe <span class="hint">loads the formula for you</span></label><select id="recipe"><option value="none">Custom recipe</option><option value="country">Country sourdough</option><option value="wholeWheat">Whole wheat sourdough</option><option value="rye">Rye sourdough</option><option value="sandwich">Soft sandwich sourdough</option><option value="jalapenoCheddar">Jalapeño cheddar sourdough</option><option value="cinnamonRoll">Cinnamon rolls</option><option value="chocolateChip">Chocolate chip sourdough</option><option value="cranberryWalnut">Cranberry walnut sourdough</option><option value="oliveRosemary">Olive rosemary sourdough</option><option value="garlicParmesan">Garlic parmesan sourdough</option></select></div>
+</section>
+<section class="panel">
+<h2>Inclusions <span class="hint">optional</span></h2>
+<div class="grid">
+<div class="field"><label>Ingredient 1</label><select id="inclusionType1"><option value="none">None</option><option value="freshJalapeno">Fresh jalapeño</option><option value="cheddar">Cheddar cheese</option><option value="creamCheese">Cream cheese</option><option value="freshFruit">Fresh fruit</option><option value="driedFruit">Dried fruit</option><option value="nuts">Nuts</option><option value="seeds">Seeds</option><option value="chocolate">Chocolate</option><option value="herbs">Fresh herbs</option><option value="olives">Olives</option><option value="roastedGarlic">Roasted garlic</option></select></div>
+<div class="field"><label for="inclusionPct1">Amount <span class="hint">% of flour</span></label><input id="inclusionPct1" type="number" min="0" max="100" step="1" value="0"></div>
+<div class="field"><label>Ingredient 2</label><select id="inclusionType2"><option value="none">None</option><option value="freshJalapeno">Fresh jalapeño</option><option value="cheddar">Cheddar cheese</option><option value="creamCheese">Cream cheese</option><option value="freshFruit">Fresh fruit</option><option value="driedFruit">Dried fruit</option><option value="nuts">Nuts</option><option value="seeds">Seeds</option><option value="chocolate">Chocolate</option><option value="herbs">Fresh herbs</option><option value="olives">Olives</option><option value="roastedGarlic">Roasted garlic</option></select></div>
+<div class="field"><label for="inclusionPct2">Amount <span class="hint">% of flour</span></label><input id="inclusionPct2" type="number" min="0" max="100" step="1" value="0"></div>
+<div class="field"><label>Ingredient 3</label><select id="inclusionType3"><option value="none">None</option><option value="freshJalapeno">Fresh jalapeño</option><option value="cheddar">Cheddar cheese</option><option value="creamCheese">Cream cheese</option><option value="freshFruit">Fresh fruit</option><option value="driedFruit">Dried fruit</option><option value="nuts">Nuts</option><option value="seeds">Seeds</option><option value="chocolate">Chocolate</option><option value="herbs">Fresh herbs</option><option value="olives">Olives</option><option value="roastedGarlic">Roasted garlic</option></select></div>
+<div class="field"><label for="inclusionPct3">Amount <span class="hint">% of flour</span></label><input id="inclusionPct3" type="number" min="0" max="100" step="1" value="0"></div>
+</div>
+<p class="note">Moisture is estimated automatically from the ingredient type and is included in the water calculation.</p>
+</section>
+<section class="panel">
+<h2>Weigh these ingredients</h2>
+<div class="results">
+<div class="result primary"><div class="label">Flour to add</div><div id="flour" class="value">—</div><div class="unit">grams</div></div>
+<div class="result primary"><div class="label">Water to add</div><div id="water" class="value">—</div><div class="unit">grams</div></div>
+<div class="result primary"><div class="label">Starter to add</div><div id="starterOut" class="value">—</div><div class="unit">grams</div></div>
+<div class="result primary"><div class="label">Salt to add</div><div id="saltOut" class="value">—</div><div class="unit">grams</div></div>
+<div class="result primary"><div class="label">Inclusion 1</div><div id="inclusionOut1" class="value">—</div><div id="inclusionLabel1" class="unit">grams</div></div>
+<div class="result primary"><div class="label">Inclusion 2</div><div id="inclusionOut2" class="value">—</div><div id="inclusionLabel2" class="unit">grams</div></div>
+<div class="result primary"><div class="label">Inclusion 3</div><div id="inclusionOut3" class="value">—</div><div id="inclusionLabel3" class="unit">grams</div></div>
+</div>
+</section>
+<section class="panel">
+<h2>What the calculator is doing</h2>
+<div class="formula">
+<div><strong>Total flour</strong><span id="totalFlour">—</span> g</div>
+<div><strong>Total water</strong><span id="totalWater">—</span> g</div>
+<div><strong>Flour in starter</strong><span id="starterFlour">—</span> g</div>
+<div><strong>Water in starter</strong><span id="starterWater">—</span> g</div>
+<div><strong>Total inclusions</strong><span id="totalInclusion">—</span> g</div>
+<div><strong>Water from inclusions</strong><span id="inclusionWater">—</span> g</div>
+<div><strong>Estimated inclusion moisture</strong><span id="inclusionMoistureUsed">—</span> %</div>
+</div>
+<p class="note" id="note">The starter contribution is subtracted from the flour and water you add to the bowl, so the final dough hits the requested hydration.</p>
+</section>
+<section class="panel footer"><div class="note">Tip: if your starter is 100% hydration, 100 g starter contains approximately 50 g flour and 50 g water.</div><button id="reset" class="reset" type="button">Reset</button></section>
+<section class="panel" id="installHelp"><h2>Use it like an app</h2><p class="note">Add this calculator to your phone's Home Screen for a standalone kitchen app experience.</p><button id="installButton" class="action" type="button" style="display:none">Install calculator</button></section>
+</main></div>
+<script>
+(function(){
+const ids=['dough','hydration','starter','starterHyd','salt','inclusionPct1','inclusionPct2','inclusionPct3'];
+const el=id=>document.getElementById(id);
+const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
+function num(id,min,max){const v=Number.parseFloat(el(id).value);return Number.isFinite(v)?clamp(v,min,max):min}
+const moisture={none:0,freshJalapeno:90,cheddar:37,creamCheese:55,freshFruit:85,driedFruit:20,nuts:5,seeds:5,chocolate:1,herbs:85,olives:80,roastedGarlic:60};
+const names={none:'None',freshJalapeno:'Fresh jalapeño',cheddar:'Cheddar',creamCheese:'Cream cheese',freshFruit:'Fresh fruit',driedFruit:'Dried fruit',nuts:'Nuts',seeds:'Seeds',chocolate:'Chocolate',herbs:'Fresh herbs',olives:'Olives',roastedGarlic:'Roasted garlic'};
+function inclusionData(){return [1,2,3].map(n=>{const t=el('inclusionType'+n).value,p=num('inclusionPct'+n,0,100)/100,w=moisture[t]||0;return {t,p,w}})}
+function calc(){
+ const D=num('dough',250,5000), H=num('hydration',50,100)/100, P=num('starter',0,40)/100, SH=num('starterHyd',50,150)/100, S=num('salt',0,4)/100;
+ const incs=inclusionData(), I=incs.reduce((a,x)=>a+x.p,0);
+ const F=D/(1+H+S+I);
+ const starter=F*P;
+ const starterFlour=starter/(1+SH);
+ const starterWater=starter-starterFlour;
+ const flour=F-starterFlour;
+ const water=H*F-starterWater;
+ const salt=F*S;
+ const inclusion=F*I;
+ const inclusionWater=incs.reduce((a,x)=>a+(F*x.p*x.w),0);
+ incs.forEach((x,i)=>{el('inclusionOut'+(i+1)).textContent=(F*x.p).toFixed(1);el('inclusionLabel'+(i+1)).textContent=names[x.t]+' • grams'});
+ const waterToAdd=Math.max(0,water-inclusionWater);
+ [['flour',flour],['water',waterToAdd],['starterOut',starter],['saltOut',salt],['totalFlour',F],['totalWater',H*F],['starterFlour',starterFlour],['starterWater',starterWater],['totalInclusion',inclusion],['inclusionWater',inclusionWater],['inclusionMoistureUsed',inclusion?inclusionWater/inclusion*100:0]].forEach(([id,v])=>el(id).textContent=v.toFixed(1));
+ const actual=flour+waterToAdd+starter+salt+inclusion+inclusionWater;
+ const err=Math.abs(actual-D);
+ el('warn').style.display=err>0.1?'block':'none';
+ el('warn').textContent=err>0.1?'Calculation check: ingredient total differs from target by '+err.toFixed(1)+' g.':' ';
+ el('note').textContent='Starter contributes '+starterFlour.toFixed(1)+' g flour + '+starterWater.toFixed(1)+' g water. Each inclusion is calculated separately, so ingredients with different moisture levels contribute the appropriate amount of water.';
+}
+ids.forEach(id=>el(id).addEventListener('input',calc));
+[1,2,3].forEach(n=>el('inclusionType'+n).addEventListener('change',calc));
+const recipes={country:{dough:1000,hydration:72,starter:20,starterHyd:100,salt:2},wholeWheat:{dough:1000,hydration:78,starter:20,starterHyd:100,salt:2},rye:{dough:1000,hydration:80,starter:25,starterHyd:100,salt:2},sandwich:{dough:1000,hydration:68,starter:20,starterHyd:100,salt:2},jalapenoCheddar:{dough:1000,hydration:70,starter:20,starterHyd:100,salt:2,incs:[['freshJalapeno',15],['cheddar',15]]},cinnamonRoll:{dough:1000,hydration:58,starter:20,starterHyd:100,salt:1.5,incs:[['none',0]]},chocolateChip:{dough:1000,hydration:68,starter:20,starterHyd:100,salt:2,incs:[['chocolate',20]]},cranberryWalnut:{dough:1000,hydration:70,starter:20,starterHyd:100,salt:2,incs:[['driedFruit',20],['nuts',15]]},oliveRosemary:{dough:1000,hydration:68,starter:20,starterHyd:100,salt:2,incs:[['olives',20],['herbs',2]]},garlicParmesan:{dough:1000,hydration:68,starter:20,starterHyd:100,salt:2,incs:[['roastedGarlic',12],['cheddar',15]]}};
+el('recipe').addEventListener('change',()=>{const r=recipes[el('recipe').value];if(!r)return;['dough','hydration','starter','starterHyd','salt'].forEach(k=>el(k).value=r[k]);[1,2,3].forEach((n,i)=>{const x=(r.incs||[])[i]||['none',0];el('inclusionType'+n).value=x[0];el('inclusionPct'+n).value=x[1];});calc()});
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.preset;const sets={classic:[1000,70,20,100,2],soft:[1000,80,20,100,2],lean:[750,68,15,100,2]};[el('dough').value,el('hydration').value,el('starter').value,el('starterHyd').value,el('salt').value]=sets[p];el('recipe').value='none';calc()}));
+el('reset').addEventListener('click',()=>{el('dough').value=1000;el('hydration').value=70;el('starter').value=20;el('starterHyd').value=100;el('salt').value=2;[1,2,3].forEach(n=>{el('inclusionType'+n).value='none';el('inclusionPct'+n).value=0;});el('recipe').value='none';calc()});
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;el('installButton').style.display='inline-block';});
+el('installButton').addEventListener('click',async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;el('installButton').style.display='none';});
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+calc();
+})();
+</script>
+</body></html>

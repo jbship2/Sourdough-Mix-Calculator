@@ -29,8 +29,8 @@ main{max-width:900px;margin:0 auto;padding:28px 18px 40px}.hero{display:flex;jus
 <div class="grid">
 <div class="field"><label for="dough">Finished dough weight <span class="hint">250–5,000 g</span></label><input id="dough" type="number" min="250" max="5000" step="1" value="1000"></div>
 <div class="field"><label for="hydration">Hydration <span class="hint">50–100%</span></label><input id="hydration" type="number" min="50" max="100" step="0.5" value="70"></div>
-<div class="field"><label for="starter">Starter <span class="hint">% of total flour</span></label><input id="starter" type="number" min="0" max="40" step="0.5" value="20"></div>
-<div class="field"><label for="starterHyd">Starter hydration <span class="hint">100% = equal flour/water</span></label><input id="starterHyd" type="number" min="50" max="150" step="1" value="100"></div>
+<div class="field"><label for="starter">Ripe starter in dough <span class="hint">% of total flour</span></label><input id="starter" type="number" min="0" max="40" step="0.5" value="20"></div>
+<div class="field"><label for="starterHyd">Chaos starter hydration <span class="hint">1:6:10 build ≈ 60%</span></label><input id="starterHyd" type="number" min="50" max="150" step="1" value="60" readonly></div>
 <div class="field"><label for="salt">Salt <span class="hint">% of total flour</span></label><input id="salt" type="number" min="0" max="4" step="0.1" value="2"></div>
 </div>
 <div class="quick"><button type="button" data-preset="classic">Classic 1 kg</button><button type="button" data-preset="soft">Soft 1 kg</button><button type="button" data-preset="lean">Lean 750 g</button></div>
@@ -58,7 +58,7 @@ main{max-width:900px;margin:0 auto;padding:28px 18px 40px}.hero{display:flex;jus
 <div class="result primary"><div class="label">Flour to add</div><div id="flour" class="value">—</div><div class="unit">grams</div></div>
 <div class="result primary"><div class="label">Water to add</div><div id="water" class="value">—</div><div class="unit">grams</div></div>
 <div class="result primary"><div class="label">Starter to add</div><div id="starterOut" class="value">—</div><div class="unit">grams</div></div>
-<div class="result primary"><div class="label">Salt to add</div><div id="saltOut" class="value">—</div><div class="unit">grams</div></div>
+<div class="result primary"><div class="label">Salt to add</div><div id="saltOut" class="value">—</div><div class="unit">grams</div></div><div class="result primary"><div class="label">Chaos seed</div><div id="chaosSeed" class="value">—</div><div class="unit">grams • 1 part</div></div><div class="result primary"><div class="label">Chaos water</div><div id="chaosWater" class="value">—</div><div class="unit">grams • 6 parts</div></div><div class="result primary"><div class="label">Chaos flour</div><div id="chaosFlour" class="value">—</div><div class="unit">grams • 10 parts</div></div>
 <div class="result primary"><div class="label">Inclusion 1</div><div id="inclusionOut1" class="value">—</div><div id="inclusionLabel1" class="unit">grams</div></div>
 <div class="result primary"><div class="label">Inclusion 2</div><div id="inclusionOut2" class="value">—</div><div id="inclusionLabel2" class="unit">grams</div></div>
 <div class="result primary"><div class="label">Inclusion 3</div><div id="inclusionOut3" class="value">—</div><div id="inclusionLabel3" class="unit">grams</div></div>
@@ -70,19 +70,19 @@ main{max-width:900px;margin:0 auto;padding:28px 18px 40px}.hero{display:flex;jus
 <div><strong>Total flour</strong><span id="totalFlour">—</span> g</div>
 <div><strong>Total water</strong><span id="totalWater">—</span> g</div>
 <div><strong>Flour in starter</strong><span id="starterFlour">—</span> g</div>
-<div><strong>Water in starter</strong><span id="starterWater">—</span> g</div>
+<div><strong>Water in starter</strong><span id="starterWater">—</span> g</div><div><strong>Chaos build ratio</strong><span>1 g seed + 6 g water + 10 g flour</span></div>
 <div><strong>Total inclusions</strong><span id="totalInclusion">—</span> g</div>
 <div><strong>Water from inclusions</strong><span id="inclusionWater">—</span> g</div>
 <div><strong>Estimated inclusion moisture</strong><span id="inclusionMoistureUsed">—</span> %</div>
 </div>
-<p class="note" id="note">The starter contribution is subtracted from the flour and water you add to the bowl, so the final dough hits the requested hydration.</p>
+<p class="note" id="note">The starter contribution is subtracted from the flour and water you add to the bowl. Chaos is built at 1:6:10 (seed:water:flour); the build itself is treated as approximately 60% hydration for dough math.</p>
 </section>
 <section class="panel footer"><div class="note">Tip: if your starter is 100% hydration, 100 g starter contains approximately 50 g flour and 50 g water.</div><button id="reset" class="reset" type="button">Reset</button></section>
 <section class="panel" id="installHelp"><h2>Use it like an app</h2><p class="note">Add this calculator to your phone's Home Screen for a standalone kitchen app experience.</p><button id="installButton" class="action" type="button" style="display:none">Install calculator</button></section>
 </main></div>
 <script>
 (function(){
-const ids=['dough','hydration','starter','starterHyd','salt','inclusionPct1','inclusionPct2','inclusionPct3'];
+const ids=['dough','hydration','starter','salt','inclusionPct1','inclusionPct2','inclusionPct3'];
 const el=id=>document.getElementById(id);
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 function num(id,min,max){const v=Number.parseFloat(el(id).value);return Number.isFinite(v)?clamp(v,min,max):min}
@@ -90,12 +90,15 @@ const moisture={none:0,freshJalapeno:90,cheddar:37,creamCheese:55,freshFruit:85,
 const names={none:'None',freshJalapeno:'Fresh jalapeño',cheddar:'Cheddar',creamCheese:'Cream cheese',freshFruit:'Fresh fruit',driedFruit:'Dried fruit',nuts:'Nuts',seeds:'Seeds',chocolate:'Chocolate',herbs:'Fresh herbs',olives:'Olives',roastedGarlic:'Roasted garlic'};
 function inclusionData(){return [1,2,3].map(n=>{const t=el('inclusionType'+n).value,p=num('inclusionPct'+n,0,100)/100,w=moisture[t]||0;return {t,p,w}})}
 function calc(){
- const D=num('dough',250,5000), H=num('hydration',50,100)/100, P=num('starter',0,40)/100, SH=num('starterHyd',50,150)/100, S=num('salt',0,4)/100;
+ const D=num('dough',250,5000), H=num('hydration',50,100)/100, P=num('starter',0,40)/100, SH=0.60, S=num('salt',0,4)/100;
  const incs=inclusionData(), I=incs.reduce((a,x)=>a+x.p,0);
  const F=D/(1+H+S+I);
  const starter=F*P;
  const starterFlour=starter/(1+SH);
  const starterWater=starter-starterFlour;
+ const chaosSeed=starter/17;
+ const chaosWater=starter*6/17;
+ const chaosFlour=starter*10/17;
  const flour=F-starterFlour;
  const water=H*F-starterWater;
  const salt=F*S;
@@ -103,19 +106,19 @@ function calc(){
  const inclusionWater=incs.reduce((a,x)=>a+(F*x.p*x.w),0);
  incs.forEach((x,i)=>{el('inclusionOut'+(i+1)).textContent=(F*x.p).toFixed(1);el('inclusionLabel'+(i+1)).textContent=names[x.t]+' • grams'});
  const waterToAdd=Math.max(0,water-inclusionWater);
- [['flour',flour],['water',waterToAdd],['starterOut',starter],['saltOut',salt],['totalFlour',F],['totalWater',H*F],['starterFlour',starterFlour],['starterWater',starterWater],['totalInclusion',inclusion],['inclusionWater',inclusionWater],['inclusionMoistureUsed',inclusion?inclusionWater/inclusion*100:0]].forEach(([id,v])=>el(id).textContent=v.toFixed(1));
+ [['flour',flour],['water',waterToAdd],['starterOut',starter],['saltOut',salt],['chaosSeed',chaosSeed],['chaosWater',chaosWater],['chaosFlour',chaosFlour],['totalFlour',F],['totalWater',H*F],['starterFlour',starterFlour],['starterWater',starterWater],['totalInclusion',inclusion],['inclusionWater',inclusionWater],['inclusionMoistureUsed',inclusion?inclusionWater/inclusion*100:0]].forEach(([id,v])=>el(id).textContent=v.toFixed(1));
  const actual=flour+waterToAdd+starter+salt+inclusion+inclusionWater;
  const err=Math.abs(actual-D);
  el('warn').style.display=err>0.1?'block':'none';
  el('warn').textContent=err>0.1?'Calculation check: ingredient total differs from target by '+err.toFixed(1)+' g.':' ';
- el('note').textContent='Starter contributes '+starterFlour.toFixed(1)+' g flour + '+starterWater.toFixed(1)+' g water. Each inclusion is calculated separately, so ingredients with different moisture levels contribute the appropriate amount of water.';
+ el('note').textContent='Chaos build: '+chaosSeed.toFixed(1)+' g existing starter + '+chaosWater.toFixed(1)+' g water + '+chaosFlour.toFixed(1)+' g flour = '+starter.toFixed(1)+' g starter. Each inclusion is calculated separately, so ingredients with different moisture levels contribute the appropriate amount of water.';
 }
 ids.forEach(id=>el(id).addEventListener('input',calc));
 [1,2,3].forEach(n=>el('inclusionType'+n).addEventListener('change',calc));
-const recipes={country:{dough:1000,hydration:72,starter:20,starterHyd:100,salt:2},wholeWheat:{dough:1000,hydration:78,starter:20,starterHyd:100,salt:2},rye:{dough:1000,hydration:80,starter:25,starterHyd:100,salt:2},sandwich:{dough:1000,hydration:68,starter:20,starterHyd:100,salt:2},jalapenoCheddar:{dough:1000,hydration:70,starter:20,starterHyd:100,salt:2,incs:[['freshJalapeno',15],['cheddar',15]]},cinnamonRoll:{dough:1000,hydration:58,starter:20,starterHyd:100,salt:1.5,incs:[['none',0]]},chocolateChip:{dough:1000,hydration:68,starter:20,starterHyd:100,salt:2,incs:[['chocolate',20]]},cranberryWalnut:{dough:1000,hydration:70,starter:20,starterHyd:100,salt:2,incs:[['driedFruit',20],['nuts',15]]},oliveRosemary:{dough:1000,hydration:68,starter:20,starterHyd:100,salt:2,incs:[['olives',20],['herbs',2]]},garlicParmesan:{dough:1000,hydration:68,starter:20,starterHyd:100,salt:2,incs:[['roastedGarlic',12],['cheddar',15]]}};
-el('recipe').addEventListener('change',()=>{const r=recipes[el('recipe').value];if(!r)return;['dough','hydration','starter','starterHyd','salt'].forEach(k=>el(k).value=r[k]);[1,2,3].forEach((n,i)=>{const x=(r.incs||[])[i]||['none',0];el('inclusionType'+n).value=x[0];el('inclusionPct'+n).value=x[1];});calc()});
-document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.preset;const sets={classic:[1000,70,20,100,2],soft:[1000,80,20,100,2],lean:[750,68,15,100,2]};[el('dough').value,el('hydration').value,el('starter').value,el('starterHyd').value,el('salt').value]=sets[p];el('recipe').value='none';calc()}));
-el('reset').addEventListener('click',()=>{el('dough').value=1000;el('hydration').value=70;el('starter').value=20;el('starterHyd').value=100;el('salt').value=2;[1,2,3].forEach(n=>{el('inclusionType'+n).value='none';el('inclusionPct'+n).value=0;});el('recipe').value='none';calc()});
+const recipes={country:{dough:1000,hydration:72,starter:20,starterHyd:60,salt:2},wholeWheat:{dough:1000,hydration:78,starter:20,starterHyd:60,salt:2},rye:{dough:1000,hydration:80,starter:25,starterHyd:60,salt:2},sandwich:{dough:1000,hydration:68,starter:20,starterHyd:60,salt:2},jalapenoCheddar:{dough:1000,hydration:70,starter:20,starterHyd:60,salt:2,incs:[['freshJalapeno',15],['cheddar',15]]},cinnamonRoll:{dough:1000,hydration:58,starter:20,starterHyd:60,salt:1.5,incs:[['none',0]]},chocolateChip:{dough:1000,hydration:68,starter:20,starterHyd:60,salt:2,incs:[['chocolate',20]]},cranberryWalnut:{dough:1000,hydration:70,starter:20,starterHyd:60,salt:2,incs:[['driedFruit',20],['nuts',15]]},oliveRosemary:{dough:1000,hydration:68,starter:20,starterHyd:60,salt:2,incs:[['olives',20],['herbs',2]]},garlicParmesan:{dough:1000,hydration:68,starter:20,starterHyd:60,salt:2,incs:[['roastedGarlic',12],['cheddar',15]]}};
+el('recipe').addEventListener('change',()=>{const r=recipes[el('recipe').value];if(!r)return;['dough','hydration','starter','salt'].forEach(k=>el(k).value=r[k]);el('starterHyd').value=60;[1,2,3].forEach((n,i)=>{const x=(r.incs||[])[i]||['none',0];el('inclusionType'+n).value=x[0];el('inclusionPct'+n).value=x[1];});calc()});
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.preset;const sets={classic:[1000,70,20,2],soft:[1000,80,20,2],lean:[750,68,15,2]};[el('dough').value,el('hydration').value,el('starter').value,el('salt').value]=sets[p];el('starterHyd').value=60;el('recipe').value='none';calc()}));
+el('reset').addEventListener('click',()=>{el('dough').value=1000;el('hydration').value=70;el('starter').value=20;el('starterHyd').value=60;el('salt').value=2;[1,2,3].forEach(n=>{el('inclusionType'+n).value='none';el('inclusionPct'+n).value=0;});el('recipe').value='none';calc()});
 let deferredInstall=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;el('installButton').style.display='inline-block';});
 el('installButton').addEventListener('click',async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;el('installButton').style.display='none';});

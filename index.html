@@ -25,17 +25,16 @@ main{max-width:900px;margin:0 auto;padding:28px 18px 40px}.hero{display:flex;jus
 <div id="app"><main>
 <section class="hero"><div><div class="eyebrow">🐘 Chaos Kitchen</div><h1>Chaos Sourdough Calculator</h1><div class="sub">Named for the starter that makes every bake an adventure. Enter the dough you want to make and let Chaos handle the math.</div></div><div class="badge">🍞 All weights in grams</div></section>
 <section class="panel">
-<h2>How do you want to start?</h2>
-<div class="mode"><button id="presetMode" class="active" type="button"><strong>Choose a recipe</strong><span>Start with one of Chaos Kitchen's recipes</span></button><button id="customMode" type="button"><strong>Customize it</strong><span>Enter your own dough settings</span></button></div>
-</section>
-<section class="panel">
-<h2>Choose a recipe</h2>
-<div class="field"><label for="recipe">Recipe <span class="hint">loads the formula for you</span></label><select id="recipe"><option value="none">Custom recipe</option><option value="country">Country sourdough</option><option value="wholeWheat">Whole wheat sourdough</option><option value="rye">Rye sourdough</option><option value="sandwich">Soft sandwich sourdough</option><option value="jalapenoCheddar">Jalapeño cheddar sourdough</option><option value="cinnamonRoll">Cinnamon rolls</option><option value="chocolateChip">Chocolate chip sourdough</option><option value="cranberryWalnut">Cranberry walnut sourdough</option><option value="oliveRosemary">Olive rosemary sourdough</option><option value="garlicParmesan">Garlic parmesan sourdough</option></select></div>
+<h2>Choose a recipe and dough size</h2>
+<div class="grid">
+<div class="field"><label for="recipe">Recipe <span class="hint">Custom shows all options</span></label><select id="recipe"><option value="none">Custom recipe</option><option value="country">Country sourdough</option><option value="wholeWheat">Whole wheat sourdough</option><option value="rye">Rye sourdough</option><option value="sandwich">Soft sandwich sourdough</option><option value="jalapenoCheddar">Jalapeño cheddar sourdough</option><option value="cinnamonRoll">Cinnamon rolls</option><option value="chocolateChip">Chocolate chip sourdough</option><option value="cranberryWalnut">Cranberry walnut sourdough</option><option value="oliveRosemary">Olive rosemary sourdough</option><option value="garlicParmesan">Garlic parmesan sourdough</option></select></div>
+<div class="field"><label for="doughSize">Dough size</label><select id="doughSize"><option value="500">Mini loaf • 500 g</option><option value="1000" selected>1 regular loaf • 1,000 g</option><option value="2000">2 regular loaves • 2,000 g</option><option value="custom">Custom size</option></select></div>
+</div>
 </section>
 <section class="panel advanced" id="advancedSettings">
 <h2>Customize your dough</h2>
 <div class="grid">
-<div class="field"><label for="dough">Finished dough weight <span class="hint">250–5,000 g</span></label><input id="dough" type="number" min="250" max="5000" step="1" value="1000"></div>
+<div class="field" id="customDoughField"><label for="dough">Finished dough weight <span class="hint">250–5,000 g</span></label><input id="dough" type="number" min="250" max="5000" step="1" value="1000"></div>
 <div class="field"><label for="hydration">Hydration <span class="hint">50–100%</span></label><input id="hydration" type="number" min="50" max="100" step="0.5" value="70"></div>
 <div class="field"><label for="starter">Ripe starter in dough <span class="hint">% of total flour</span></label><input id="starter" type="number" min="0" max="40" step="0.5" value="20"></div>
 <div class="field"><label for="starterHyd">Chaos starter hydration <span class="hint">1:6:10 build ≈ 60%</span></label><input id="starterHyd" type="number" min="50" max="150" step="1" value="60" readonly></div>
@@ -44,11 +43,7 @@ main{max-width:900px;margin:0 auto;padding:28px 18px 40px}.hero{display:flex;jus
 <div class="quick"><button type="button" data-preset="classic">Classic 1 kg</button><button type="button" data-preset="soft">Soft 1 kg</button><button type="button" data-preset="lean">Lean 750 g</button></div>
 <div id="warn" class="warn"></div>
 </section>
-<section class="panel">
-<h2>Choose a recipe</h2>
-<div class="field"><label for="recipe">Recipe <span class="hint">loads the formula for you</span></label><select id="recipe"><option value="none">Custom recipe</option><option value="country">Country sourdough</option><option value="wholeWheat">Whole wheat sourdough</option><option value="rye">Rye sourdough</option><option value="sandwich">Soft sandwich sourdough</option><option value="jalapenoCheddar">Jalapeño cheddar sourdough</option><option value="cinnamonRoll">Cinnamon rolls</option><option value="chocolateChip">Chocolate chip sourdough</option><option value="cranberryWalnut">Cranberry walnut sourdough</option><option value="oliveRosemary">Olive rosemary sourdough</option><option value="garlicParmesan">Garlic parmesan sourdough</option></select></div>
-</section>
-<section class="panel">
+<section class="panel" id="inclusionsPanel">
 <h2>Inclusions <span class="hint">optional</span></h2>
 <div class="grid">
 <div class="field"><label>Ingredient 1</label><select id="inclusionType1"><option value="none">None</option><option value="freshJalapeno">Fresh jalapeño</option><option value="cheddar">Cheddar cheese</option><option value="creamCheese">Cream cheese</option><option value="freshFruit">Fresh fruit</option><option value="driedFruit">Dried fruit</option><option value="nuts">Nuts</option><option value="seeds">Seeds</option><option value="chocolate">Chocolate</option><option value="herbs">Fresh herbs</option><option value="olives">Olives</option><option value="roastedGarlic">Roasted garlic</option></select></div>
@@ -66,10 +61,13 @@ main{max-width:900px;margin:0 auto;padding:28px 18px 40px}.hero{display:flex;jus
 <div class="result primary"><div class="label">Flour to add</div><div id="flour" class="value">—</div><div class="unit">grams</div></div>
 <div class="result primary"><div class="label">Water to add</div><div id="water" class="value">—</div><div class="unit">grams</div></div>
 <div class="result primary"><div class="label">Starter to add</div><div id="starterOut" class="value">—</div><div class="unit">grams</div></div>
-<div class="result primary"><div class="label">Salt to add</div><div id="saltOut" class="value">—</div><div class="unit">grams</div></div><div class="result primary"><div class="label">Chaos seed</div><div id="chaosSeed" class="value">—</div><div class="unit">grams • 1 part</div></div><div class="result primary"><div class="label">Chaos water</div><div id="chaosWater" class="value">—</div><div class="unit">grams • 6 parts</div></div><div class="result primary"><div class="label">Chaos flour</div><div id="chaosFlour" class="value">—</div><div class="unit">grams • 10 parts</div></div>
-<div class="result primary"><div class="label">Inclusion 1</div><div id="inclusionOut1" class="value">—</div><div id="inclusionLabel1" class="unit">grams</div></div>
-<div class="result primary"><div class="label">Inclusion 2</div><div id="inclusionOut2" class="value">—</div><div id="inclusionLabel2" class="unit">grams</div></div>
-<div class="result primary"><div class="label">Inclusion 3</div><div id="inclusionOut3" class="value">—</div><div id="inclusionLabel3" class="unit">grams</div></div>
+<div class="result primary"><div class="label">Salt to add</div><div id="saltOut" class="value">—</div><div class="unit">grams</div></div>
+<div class="result primary"><div class="label">Chaos seed</div><div id="chaosSeed" class="value">—</div><div class="unit">grams • 1 part</div></div>
+<div class="result primary"><div class="label">Chaos water</div><div id="chaosWater" class="value">—</div><div class="unit">grams • 6 parts</div></div>
+<div class="result primary"><div class="label">Chaos flour</div><div id="chaosFlour" class="value">—</div><div class="unit">grams • 10 parts</div></div>
+<div class="result primary" id="inclusionResult1"><div class="label">Inclusion 1</div><div id="inclusionOut1" class="value">—</div><div id="inclusionLabel1" class="unit">grams</div></div>
+<div class="result primary" id="inclusionResult2"><div class="label">Inclusion 2</div><div id="inclusionOut2" class="value">—</div><div id="inclusionLabel2" class="unit">grams</div></div>
+<div class="result primary" id="inclusionResult3"><div class="label">Inclusion 3</div><div id="inclusionOut3" class="value">—</div><div id="inclusionLabel3" class="unit">grams</div></div>
 </div>
 </section>
 <section class="panel">
@@ -78,7 +76,8 @@ main{max-width:900px;margin:0 auto;padding:28px 18px 40px}.hero{display:flex;jus
 <div><strong>Total flour</strong><span id="totalFlour">—</span> g</div>
 <div><strong>Total water</strong><span id="totalWater">—</span> g</div>
 <div><strong>Flour in starter</strong><span id="starterFlour">—</span> g</div>
-<div><strong>Water in starter</strong><span id="starterWater">—</span> g</div><div><strong>Chaos build ratio</strong><span>1 g seed + 6 g water + 10 g flour</span></div>
+<div><strong>Water in starter</strong><span id="starterWater">—</span> g</div>
+<div><strong>Chaos build ratio</strong><span>1 g seed + 6 g water + 10 g flour</span></div>
 <div><strong>Total inclusions</strong><span id="totalInclusion">—</span> g</div>
 <div><strong>Water from inclusions</strong><span id="inclusionWater">—</span> g</div>
 <div><strong>Estimated inclusion moisture</strong><span id="inclusionMoistureUsed">—</span> %</div>
@@ -86,7 +85,7 @@ main{max-width:900px;margin:0 auto;padding:28px 18px 40px}.hero{display:flex;jus
 <p class="note" id="note">The starter contribution is subtracted from the flour and water you add to the bowl. Chaos is built at 1:6:10 (seed:water:flour); the build itself is treated as approximately 60% hydration for dough math.</p>
 </section>
 <section class="panel footer"><div class="note">Tip: if your starter is 100% hydration, 100 g starter contains approximately 50 g flour and 50 g water.</div><button id="reset" class="reset" type="button">Reset</button></section>
-<section class="panel" id="installHelp"><h2>Use it like an app</h2><p class="note">Add this calculator to your phone's Home Screen for a standalone kitchen app experience.</p><button id="installButton" class="action" type="button" style="display:none">Install calculator</button></section>
+<section class="panel" id="installHelp"><h2>Use it like an app</h2><p class="note">Once this calculator is hosted at a secure web address, add it to your phone's Home Screen for a standalone kitchen app experience.</p><button id="installButton" class="action" type="button" style="display:none">Install calculator</button></section>
 </main></div>
 <script>
 (function(){
@@ -115,26 +114,26 @@ function calc(){
  incs.forEach((x,i)=>{el('inclusionOut'+(i+1)).textContent=(F*x.p).toFixed(1);el('inclusionLabel'+(i+1)).textContent=names[x.t]+' • grams'});
  const waterToAdd=Math.max(0,water-inclusionWater);
  [['flour',flour],['water',waterToAdd],['starterOut',starter],['saltOut',salt],['chaosSeed',chaosSeed],['chaosWater',chaosWater],['chaosFlour',chaosFlour],['totalFlour',F],['totalWater',H*F],['starterFlour',starterFlour],['starterWater',starterWater],['totalInclusion',inclusion],['inclusionWater',inclusionWater],['inclusionMoistureUsed',inclusion?inclusionWater/inclusion*100:0]].forEach(([id,v])=>el(id).textContent=v.toFixed(1));
- const actual=flour+waterToAdd+starter+salt+inclusion+inclusionWater;
+ const actual=flour+waterToAdd+starter+salt+inclusion;
  const err=Math.abs(actual-D);
  el('warn').style.display=err>0.1?'block':'none';
  el('warn').textContent=err>0.1?'Calculation check: ingredient total differs from target by '+err.toFixed(1)+' g.':' ';
  el('note').textContent='Chaos build: '+chaosSeed.toFixed(1)+' g existing starter + '+chaosWater.toFixed(1)+' g water + '+chaosFlour.toFixed(1)+' g flour = '+starter.toFixed(1)+' g starter. Each inclusion is calculated separately, so ingredients with different moisture levels contribute the appropriate amount of water.';
 }
 ids.forEach(id=>el(id).addEventListener('input',calc));
-[1,2,3].forEach(n=>el('inclusionType'+n).addEventListener('change',calc));
-const recipes={country:{dough:1000,hydration:72,starter:20,starterHyd:60,salt:2},wholeWheat:{dough:1000,hydration:78,starter:20,starterHyd:60,salt:2},rye:{dough:1000,hydration:80,starter:25,starterHyd:60,salt:2},sandwich:{dough:1000,hydration:68,starter:20,starterHyd:60,salt:2},jalapenoCheddar:{dough:1000,hydration:70,starter:20,starterHyd:60,salt:2,incs:[['freshJalapeno',15],['cheddar',15]]},cinnamonRoll:{dough:1000,hydration:58,starter:20,starterHyd:60,salt:1.5,incs:[['none',0]]},chocolateChip:{dough:1000,hydration:68,starter:20,starterHyd:60,salt:2,incs:[['chocolate',20]]},cranberryWalnut:{dough:1000,hydration:70,starter:20,starterHyd:60,salt:2,incs:[['driedFruit',20],['nuts',15]]},oliveRosemary:{dough:1000,hydration:68,starter:20,starterHyd:60,salt:2,incs:[['olives',20],['herbs',2]]},garlicParmesan:{dough:1000,hydration:68,starter:20,starterHyd:60,salt:2,incs:[['roastedGarlic',12],['cheddar',15]]}};
-el('recipe').addEventListener('change',()=>{const r=recipes[el('recipe').value];if(!r)return;['dough','hydration','starter','salt'].forEach(k=>el(k).value=r[k]);el('starterHyd').value=60;[1,2,3].forEach((n,i)=>{const x=(r.incs||[])[i]||['none',0];el('inclusionType'+n).value=x[0];el('inclusionPct'+n).value=x[1];});calc()});
-function setMode(mode){const custom=mode==='custom';el('advancedSettings').classList.toggle('show',custom);el('presetMode').classList.toggle('active',!custom);el('customMode').classList.toggle('active',custom);if(custom){el('recipe').value='none';}else if(el('recipe').value==='none'){el('recipe').value='country';const r=recipes.country;['dough','hydration','starter','salt'].forEach(k=>el(k).value=r[k]);el('starterHyd').value=60;[1,2,3].forEach(n=>{el('inclusionType'+n).value='none';el('inclusionPct'+n).value=0;});}calc()}
-el('presetMode').addEventListener('click',()=>setMode('preset'));el('customMode').addEventListener('click',()=>setMode('custom'));
-document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.preset;const sets={classic:[1000,70,20,2],soft:[1000,80,20,2],lean:[750,68,15,2]};[el('dough').value,el('hydration').value,el('starter').value,el('salt').value]=sets[p];el('starterHyd').value=60;el('recipe').value='none';calc()}));
+const recipes={country:{dough:1000,hydration:72,starter:20,salt:2},wholeWheat:{dough:1000,hydration:78,starter:20,salt:2},rye:{dough:1000,hydration:80,starter:25,salt:2},sandwich:{dough:1000,hydration:68,starter:20,salt:2},jalapenoCheddar:{dough:1000,hydration:70,starter:20,salt:2,incs:[['freshJalapeno',15],['cheddar',15]]},cinnamonRoll:{dough:1000,hydration:58,starter:20,salt:1.5,incs:[['none',0]]},chocolateChip:{dough:1000,hydration:68,starter:20,salt:2,incs:[['chocolate',20]]},cranberryWalnut:{dough:1000,hydration:70,starter:20,salt:2,incs:[['driedFruit',20],['nuts',15]]},oliveRosemary:{dough:1000,hydration:68,starter:20,salt:2,incs:[['olives',20],['herbs',2]]},garlicParmesan:{dough:1000,hydration:68,starter:20,salt:2,incs:[['roastedGarlic',12],['cheddar',15]]}};
+function updateSize(){const size=el('doughSize').value;const custom=size==='custom';el('customDoughField').style.display=custom?'block':'none';if(!custom)el('dough').value=size;calc()}
+function updateInclusions(){const custom=el('recipe').value==='none',r=recipes[el('recipe').value],incs=custom?3:((r&&r.incs)||[]).filter(x=>x[0]!=='none'&&x[1]>0).length,hasIncs=custom||incs>0;el('inclusionsPanel').style.display=hasIncs?'block':'none';[1,2,3].forEach(n=>el('inclusionResult'+n).style.display=custom||n<=incs?'block':'none')}
+el('doughSize').addEventListener('change',updateSize);
+el('recipe').addEventListener('change',()=>{const r=recipes[el('recipe').value],custom=el('recipe').value==='none';el('advancedSettings').classList.toggle('show',custom);if(r){['hydration','starter','salt'].forEach(k=>el(k).value=r[k]);[1,2,3].forEach((n,i)=>{const x=(r.incs||[])[i]||['none',0];el('inclusionType'+n).value=x[0];el('inclusionPct'+n).value=x[1];});}updateInclusions();calc()});
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.preset;const sets={classic:[1000,70,20,2],soft:[1000,80,20,2],lean:[750,68,15,2]};[el('dough').value,el('hydration').value,el('starter').value,el('salt').value]=sets[p];el('starterHyd').value=60;calc()}));
 el('reset').addEventListener('click',()=>{el('dough').value=1000;el('hydration').value=70;el('starter').value=20;el('starterHyd').value=60;el('salt').value=2;[1,2,3].forEach(n=>{el('inclusionType'+n).value='none';el('inclusionPct'+n).value=0;});el('recipe').value='none';calc()});
 let deferredInstall=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;el('installButton').style.display='inline-block';});
 el('installButton').addEventListener('click',async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;el('installButton').style.display='none';});
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+el('advancedSettings').classList.add('show');
+updateInclusions();
 calc();
-setMode('preset');
 })();
 </script>
 </body></html>
